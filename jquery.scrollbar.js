@@ -3,46 +3,60 @@
  * Licensed under the GPL (http://www.opensource.org/licenses/gpl-license.php) license.
  *
  * @author: Miguel Guerreiro
- * @revision: 0080
- * @version: 0.8
+ * @revision: 0090
+ * @version: 0.9
  * @requires: jQuery 1.3+
  */
 
 ;(function($) {
 	$.event.mousewheel = {
 		giveFocus: function(el, up, down, preventDefault) {
-			if (el._handleMousewheel) jQuery(el).unmousewheel();
+			if (el._handleMousewheel) {
+				$(el).unmousewheel();
+			}
 			if (preventDefault==window.undefined && down && down.constructor!=Function) {
 				preventDefault=down;
 				down=null;
 			}
-			el._handleMousewheel=function(event) {
-				if (!event) event=window.event;
+			el._handleMousewheel=function(ev) {
+				if (!ev) {
+					ev = window.event;
+				}
 				if (preventDefault) {
-					if (event.preventDefault) {
-						event.preventDefault();
+					if (ev.preventDefault) {
+						ev.preventDefault();
 					} else {
-						event.returnValue=false;
+						ev.returnValue=false;
 					}
 				}
 				var delta=0;
-				if (event.wheelDelta) {
-					delta=event.wheelDelta/120;
+				if (ev.wheelDelta) {
+					delta=ev.wheelDelta/120;
 				} else {
-					if (event.detail) delta=-event.detail/3;
+					if (ev.detail) {
+						delta=-ev.detail/3;
+					}
 				}
 				if (up && (delta > 0 || !down)) {
-					up.apply(el, [event, delta]);
+					up.apply(el, [ev, delta]);
 				} else {
-					if (down && delta < 0) down.apply(el, [event, delta]);
+					if (down && delta < 0) {
+						down.apply(el, [ev, delta]);
+					}
 				}
 			};
-			if (window.addEventListener) window.addEventListener('DOMMouseScroll', el._handleMousewheel, false);
+			if (window.addEventListener) {
+				window.addEventListener('DOMMouseScroll', el._handleMousewheel, false);
+			}
 			window.onmousewheel=document.onmousewheel=el._handleMousewheel;
 		},
 		removeFocus: function(el) {
-			if (!el._handleMousewheel) return;
-			if (window.removeEventListener) window.removeEventListener('DOMMouseScroll', el._handleMousewheel, false);
+			if (!el._handleMousewheel) {
+				return;
+			}
+			if (window.removeEventListener) {
+				window.removeEventListener('DOMMouseScroll', el._handleMousewheel, false);
+			}
 			window.onmousewheel=document.onmousewheel=null;
 			el._handleMousewheel=null;
 		}
@@ -57,20 +71,20 @@
 			url: '',
 			background: '',
 			arrow: {
-				width: 26,
-				height: 25,
+				width: 0,
+				height: 0,
 				imageUp: '',
 				imageDown: ''
 			},
 			scroller: {
-				width: 16,
-				height: 16,
+				width: 0,
+				height: 0,
 				image: ''
 			},
 			scrollbar: {
-				width: 26,
+				width: 0,
 				height: $parentElem.height(),
-				step: 20
+				step: 0
 			}
 		},
 		settings = $.extend({}, defaultSettings, options),
@@ -82,50 +96,60 @@
 				'float': 'left',
 				'width': settings.width + 'px',
 				'height': settings.height + 'px',
-				'overflow': 'hidden'})
+				'overflow': 'hidden'
+			})
 			.appendTo($parentElem),
 		$containerHtml = $('<div/>')
 			.attr('id', parentID+'_scrollbar_html')
-			.css({'display': 'block',
+			.css({
+				'display': 'block',
 				'float': 'left',
 				'width': (settings.width-settings.scrollbar.width-20)+'px',
-				'padding': '0 10px'})
+				'padding': '0 10px'
+			})
 			.html(originalHTML)
 			.appendTo($container),
 		$scrollbar = $('<div/>')
 			.attr('id', parentID+'_scrollbar_scroll')
-			.css({'display': 'block',
+			.css({
+				'display': 'block',
 				'float': 'left',
 				'width': settings.scrollbar.width+'px',
 				'height': settings.scrollbar.height+'px'})
 			.appendTo($container),
 		$scrollbarUp = $('<div/>')
 			.attr('id', parentID+'_scrollbar_scroll_up')
-			.css({'display': 'block',
+			.css({
+				'display': 'block',
 				'float': 'left',
 				'width': settings.arrow.width+'px',
-				'height': '25px',
+				'height': settings.arrow.height+'px',
 				'background': 'transparent url(\''+settings.url+'/'+settings.arrow.imageUp+'\') scroll no-repeat -'+settings.arrow.width+'px 0px',
 				'cursor': 'pointer',
-				'overflow': 'hidden'})
+				'overflow': 'hidden'
+			})
 			.appendTo($scrollbar),
 		$scrollbarTrack = $('<div/>')
 			.attr('id', parentID+'_scrollbar_scroll_track')
-			.css({'display': 'block',
+			.css({
+				'display': 'block',
 				'float': 'left',
 				'width': settings.scrollbar.width+'px',
 				'height': (settings.height-(settings.arrow.height*2))+'px',
-				'background': 'transparent url(\''+settings.url+'/'+settings.background+'\') scroll repeat-y 0px 0px'})
+				'background': 'transparent url(\''+settings.url+'/'+settings.background+'\') scroll repeat-y 0px 0px'
+			})
 			.appendTo($scrollbar),
 		$scrollbarDown = $('<div/>')
 			.attr('id', parentID+'_scrollbar_scroll_dn')
-			.css({'display': 'block',
+			.css({
+				'display': 'block',
 				'float': 'left',
 				'width': settings.arrow.width+'px',
-				'height': '25px',
+				'height': settings.arrow.height+'px',
 				'background': 'transparent url(\''+settings.url+'/'+settings.arrow.imageDown+'\') scroll no-repeat 0px 0px',
 				'cursor': 'pointer',
-				'overflow': 'hidden'})
+				'overflow': 'hidden'
+			})
 			.appendTo($scrollbar),
 		$scrollbarPos = $('<div/>')
 			.attr('id', parentID+'_scrollbar_scroll_pos')
@@ -137,15 +161,17 @@
 				'top': '0',
 				'left': ((settings.scrollbar.width-settings.scroller.width)/2)+'px',
 				'background': 'transparent url(\''+settings.url+'/'+settings.scroller.image+'\') scroll no-repeat 0px 0px',
-				'cursor': 'pointer'})
+				'cursor': 'pointer'
+			})
 			.appendTo($scrollbarTrack);
-		var m_height=($containerHtml.height()-settings.height);
-		var m_scroll=settings.height-(settings.arrow.height*2)-settings.scroller.height;
-		var m_step=Math.ceil(m_height/settings.scrollbar.step);
-		var n_step=0;
-		var scroll_pos=0;
-		var min_offset=$scrollbarTrack.offset().top+(settings.scroller.height/2);
-		var max_offset=min_offset+m_scroll;
+		var mHeight=($containerHtml.height()-settings.height);
+		var mScroll=settings.height-(settings.arrow.height*2)-settings.scroller.height;
+		var mStep=Math.ceil(mHeight/settings.scrollbar.step);
+		var nStep=0;
+		var scrollPos=0;
+		var minOffset=$scrollbarTrack.offset().top+(settings.scroller.height/2);
+		var maxOffset=minOffset+mScroll;
+		var mouseEvent;
 		var getPos=function(event, c) {
 			var p=c=='X'?'Left':'Top';
 			return event['page'+c]||
@@ -153,11 +179,11 @@
 				document.body['scroll'+p]))||0;
 		},
 		scrollUp=function() {
-			if (n_step>0) {
-				n_step--;
-				var d_percent=n_step/m_step;
-				$containerHtml.css({'margin-top':'-'+(d_percent*m_height)+'px'});
-				$scrollbarPos.css({'top':(d_percent*m_scroll)+'px'});
+			if (nStep>0) {
+				nStep--;
+				var dPercent=nStep/mStep;
+				$containerHtml.css({'margin-top':'-'+(dPercent*mHeight)+'px'});
+				$scrollbarPos.css({'top':(dPercent*mScroll)+'px'});
 				$scrollbarDown.css({'background-position': '0 0'});
 				if (n_step>0) {
 					$scrollbarUp.css({'background-position': '0 0'});
@@ -167,13 +193,13 @@
 			}
 		},
 		scrollDown=function() {
-			if (n_step<m_step) {
-				n_step++;
-				var d_percent = n_step/m_step;
-				$containerHtml.css({'margin-top':'-'+(d_percent*m_height)+'px'});
-				$scrollbarPos.css({'top':(d_percent*m_scroll)+'px'});
+			if (nStep<mStep) {
+				nStep++;
+				var dPercent = nStep/mStep;
+				$containerHtml.css({'margin-top':'-'+(dPercent*m_height)+'px'});
+				$scrollbarPos.css({'top':(dPercent*mScroll)+'px'});
 				$scrollbarUp.css({'background-position': '0 0'});
-				if (n_step < m_step) {
+				if (nStep < mStep) {
 					$scrollbarDown.css({'background-position': '0 0'});
 				} else {
 					$scrollbarDown.css({'background-position': '-'+settings.arrow.width+'px 0'});
@@ -184,25 +210,25 @@
 			return false;
 		},
 		dragUpdate=function(e) {
-			var to_pos=getPos(e, 'Y');
-			if (to_pos>=min_offset&&to_pos<=max_offset) {
-				if (to_pos<(min_offset+10)) {
+			var toPos=getPos(e, 'Y');
+			if (toPos>=minOffset&&toPos<=maxOffset) {
+				if (toPos<(minOffset+10)) {
 					$scrollbarUp.css({'background-position': '-'+settings.arrow.width+'px 0'});
-					to_pos = min_offset; // make it snap
+					toPos = minOffset;
 				} else {
 					$scrollbarUp.css({'background-position': '0 0'});
 				}
-				if (to_pos>(max_offset-10)) {
+				if (toPos>(maxOffset-10)) {
 					$scrollbarDown.css({'background-position': '-'+settings.arrow.width+'px 0'});
-					to_pos = max_offset; // make it snap
+					toPos = maxOffset;
 				} else {
 					$scrollbarDown.css({'background-position': '0 0'});
 				}
-				scroll_pos = (to_pos-min_offset);
-				d_percent = scroll_pos/(max_offset-min_offset);
-				n_step = Math.round(d_percent*m_step);
-				$containerHtml.css({'margin-top': '-'+(d_percent*m_height)+'px'});
-				$scrollbarPos.css({'top': (d_percent*m_scroll)+'px'});
+				scrollPos = (toPos-minOffset);
+				dPercent = scrollPos/(maxOffset-minOffset);
+				nStep = Math.round(dPercent*mStep);
+				$containerHtml.css({'margin-top': '-'+(d_percent*mHeight)+'px'});
+				$scrollbarPos.css({'top': (dPercent*mScroll)+'px'});
 			}
 		},
 		dragStart=function(e) {
@@ -220,7 +246,7 @@
 			}
 			return false;
 		};
-		if (m_height<=0) {
+		if (mHeight<=0) {
 			$scrollbarUp.css({
 				'background-position': '-'+(settings.arrow.width*2)+'px 0',
 				'cursor': 'default'
@@ -232,7 +258,17 @@
 			$scrollbarPos.remove();
 		} else {
 			$scrollbarUp.click(scrollUp);
+			$scrollbarUp.mousedown(function() {
+				mouseEvent = setInterval(scrollUp,100);
+			}).mouseup(function() {
+				mouseEvent = clearInterval(mouseEvent);
+			});
 			$scrollbarDown.click(scrollDown);
+			$scrollbarDown.mousedown(function() {
+				mouseEvent = setInterval(scrollDown,100);
+			}).mouseup(function() {
+				mouseEvent = clearInterval(mouseEvent);
+			});
 			$scrollbarTrack.bind('mousedown', dragStart);
 			$container.hover(function() {
 				$.event.mousewheel.giveFocus(this, scrollUp, scrollDown, true);
